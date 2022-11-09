@@ -22,6 +22,6 @@ WORKDIR /app
 
 EXPOSE 6767 
 
-CMD ["./api"]
+CMD ["./apa"]
 
 
