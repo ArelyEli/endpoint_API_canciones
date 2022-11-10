@@ -9,7 +9,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func SaveToDBJson(Data models.ResponseJson) {
+func SaveToDBJsonL(Data models.ResponseJson) {
 
 	const db string = "songs.db"
 
@@ -51,7 +51,7 @@ func SaveToDBJson(Data models.ResponseJson) {
 
 }
 
-func createLIKEQuery(query, column string) string {
+func createLIKEQueryL(query, column string) string {
 
 	words := strings.Fields(query)
 	var finalQuery string
@@ -63,7 +63,7 @@ func createLIKEQuery(query, column string) string {
 	return finalQuery
 }
 
-func ExecQuery(query string) []models.SongJson {
+func ExecQueryL(query string) []models.SongJson {
 	const db string = "songs.db"
 
 	conn, _ := sql.Open("sqlite3", db)
@@ -89,7 +89,7 @@ func ExecQuery(query string) []models.SongJson {
 	return result
 }
 
-func ReadFromDB(song, artist, album string) []models.SongJson {
+func ReadFromDBL(song, artist, album string) []models.SongJson {
 
 	songLikeQuery := createLIKEQuery(song, "Name")
 	artistLikeQuery := createLIKEQuery(artist, "Artist")
@@ -102,7 +102,7 @@ func ReadFromDB(song, artist, album string) []models.SongJson {
 	return response
 }
 
-func SaveToDBXML(Data models.ResponseXML) {
+func SaveToDBXMLL(Data models.ResponseXML) {
 
 	const db string = "songs.db"
 
@@ -144,7 +144,7 @@ func SaveToDBXML(Data models.ResponseXML) {
 
 }
 
-func InitDB() {
+func InitDBL() {
 	const db string = "songs.db"
 
 	conn, _ := sql.Open("sqlite3", db)
