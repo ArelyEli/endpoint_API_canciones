@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"songs_api/server"
 	"time"
-	// "songs_api/database"
 )
 
 func main() {
