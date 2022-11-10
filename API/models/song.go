@@ -16,7 +16,7 @@ type SongJson struct {
 	Artwork  string `json:"collectionViewUrl"`
 	Price    int16  `json:"trackPrice"`
 	Origin   string
-	Query    string
+	// Query    string
 }
 
 type ResponseXML struct {
@@ -33,5 +33,5 @@ type SongXML struct {
 	Artwork  string `xml:"SongUrl" json:"collectionViewUrl"`
 	Price    int16
 	Origin   string
-	Query    string
+	// Query    string
 }

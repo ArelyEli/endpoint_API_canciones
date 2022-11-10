@@ -32,7 +32,6 @@ func get_songs(query string) models.ResponseJson {
 	// Modificación de valores
 	for i := 0; i < len(DataObject.Songs); i++ {
 		DataObject.Songs[i].Origin = "Apple"
-		DataObject.Songs[i].Query = query
 	}
 	return DataObject
 }

@@ -2,12 +2,14 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"songs_api/models"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func SaveToDBJson(Data models.ResponseJson) {
+func SaveToDBJsonL(Data models.ResponseJson) {
 
 	const db string = "songs.db"
 
@@ -23,15 +25,14 @@ func SaveToDBJson(Data models.ResponseJson) {
 		Album VARCHAR(64),
 		Artwork VARCHAR(64),
 		Price VARCHAR(64),
-		Origin VARCHAR(64),
-		Query VARCHAR(64)
+		Origin VARCHAR(64)
 	)
 	`)
 	statement.Exec()
 
 	const sqlAdd = `INSERT INTO songs 
-		(ID, Name, Artist, Duration, Album, Artwork, Price, Origin, Query) 
-		VALUES (?,?,?,?,?,?,?,?,?)`
+		(ID, Name, Artist, Duration, Album, Artwork, Price, Origin) 
+		VALUES (?,?,?,?,?,?,?,?)`
 
 	for _, song := range Data.Songs {
 		// fmt.Println(song)
@@ -45,21 +46,29 @@ func SaveToDBJson(Data models.ResponseJson) {
 			song.Artwork,
 			song.Price,
 			song.Origin,
-			song.Query)
+		)
 	}
 
 }
 
-func Read_from_db(query string) []models.SongJson {
+func createLIKEQueryL(query, column string) string {
+
+	words := strings.Fields(query)
+	var finalQuery string
+	for _, word := range words {
+
+		finalQuery += column + " LIKE" + " \"%" + word + "%\" OR "
+		// fmt.Println(finalQuery)
+	}
+	return finalQuery
+}
+
+func ExecQueryL(query string) []models.SongJson {
 	const db string = "songs.db"
 
 	conn, _ := sql.Open("sqlite3", db)
 
-	rows, _ := conn.Query(`
-		SELECT * 
-		FROM songs
-		WHERE Query = ?
-	`, query)
+	rows, _ := conn.Query(query)
 
 	var result []models.SongJson
 	for rows.Next() {
@@ -73,16 +82,27 @@ func Read_from_db(query string) []models.SongJson {
 			&item.Artwork,
 			&item.Price,
 			&item.Origin,
-			&item.Query,
 		)
 		result = append(result, item)
 	}
-	// fmt.Println(result)
+	fmt.Println(result)
 	return result
-
 }
 
-func SaveToDBXML(Data models.ResponseXML) {
+func ReadFromDBL(song, artist, album string) []models.SongJson {
+
+	songLikeQuery := createLIKEQuery(song, "Name")
+	artistLikeQuery := createLIKEQuery(artist, "Artist")
+	albumLikeQuery := createLIKEQuery(album, "Album")
+	likeQuery := songLikeQuery + artistLikeQuery + albumLikeQuery
+
+	query := "SELECT * FROM songs WHERE " + likeQuery[:len(likeQuery)-3] + " LIMIT 10"
+
+	response := ExecQuery(query)
+	return response
+}
+
+func SaveToDBXMLL(Data models.ResponseXML) {
 
 	const db string = "songs.db"
 
@@ -98,15 +118,14 @@ func SaveToDBXML(Data models.ResponseXML) {
 		Album VARCHAR(64),
 		Artwork VARCHAR(64),
 		Price VARCHAR(64),
-		Origin VARCHAR(64),
-		Query VARCHAR(64)
+		Origin VARCHAR(64)
 	)
 	`)
 	statement.Exec()
 
 	const sqlAdd = `INSERT INTO songs 
-		(ID, Name, Artist, Duration, Album, Artwork, Price, Origin, Query) 
-		VALUES (?,?,?,?,?,?,?,?,?)`
+		(ID, Name, Artist, Duration, Album, Artwork, Price, Origin) 
+		VALUES (?,?,?,?,?,?,?,?)`
 
 	for _, song := range Data.Songs {
 		// fmt.Println(song)
@@ -120,12 +139,12 @@ func SaveToDBXML(Data models.ResponseXML) {
 			song.Artwork,
 			song.Price,
 			song.Origin,
-			song.Query)
+		)
 	}
 
 }
 
-func InitDB() {
+func InitDBL() {
 	const db string = "songs.db"
 
 	conn, _ := sql.Open("sqlite3", db)
@@ -140,8 +159,7 @@ func InitDB() {
 		Album VARCHAR(64),
 		Artwork VARCHAR(64),
 		Price VARCHAR(64),
-		Origin VARCHAR(64),
-		Query VARCHAR(64)
+		Origin VARCHAR(64)
 	)
 	`)
 	statement.Exec()
