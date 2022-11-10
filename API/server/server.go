@@ -13,23 +13,35 @@ import (
 func getCanciones(c *gin.Context) {
 	artistName := c.Query("artist")
 	songName := c.Query("song")
+	albumName := c.Query("album")
 
 	artistNameLower := strings.ToLower(artistName)
 	songNameLower := strings.ToLower(songName)
+	albumNameLower := strings.ToLower(albumName)
 
 	token := c.Query("token")
 
-	if artistName == "" || songName == "" || token == "" {
-		c.String(http.StatusBadRequest, "artist, song and token are required")
+	if token == "" {
+		c.String(http.StatusBadRequest, "token is required")
+
 	} else if IsAValidateToken(token) {
-		data := database.Read_from_db(songNameLower + " " + artistNameLower)
-		if data == nil {
-			endpoints.Get_itunes_Data(songNameLower + " " + artistNameLower)
-			endpoints.GetChartLyricsData(artistNameLower, songNameLower)
-			data := database.Read_from_db(songNameLower + " " + artistNameLower)
-			c.IndentedJSON(http.StatusOK, data)
+
+		if artistNameLower == "" && songNameLower == "" && albumNameLower == "" {
+			query := "SELECT * FROM songs LIMIT 10"
+			response := database.ExecQuery(query)
+			c.IndentedJSON(http.StatusOK, response)
 		} else {
-			c.IndentedJSON(http.StatusOK, data)
+
+			data := database.ReadFromDB(songNameLower, artistNameLower, albumNameLower)
+			if data == nil {
+				fmt.Println("New Search")
+				endpoints.Get_itunes_Data(songNameLower + " " + artistNameLower + " " + albumNameLower)
+				endpoints.GetChartLyricsData(artistNameLower, songNameLower)
+				data := database.ReadFromDB(songNameLower, artistNameLower, albumNameLower)
+				c.IndentedJSON(http.StatusOK, data)
+			} else {
+				c.IndentedJSON(http.StatusOK, data)
+			}
 		}
 	} else {
 		c.String(http.StatusBadRequest, "token is invalide")

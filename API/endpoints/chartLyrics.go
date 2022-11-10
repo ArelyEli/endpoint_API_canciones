@@ -25,7 +25,6 @@ func getSongs(artistName, songName string) models.ResponseXML {
 
 	for i := 0; i < len(DataObject.Songs); i++ {
 		DataObject.Songs[i].Origin = "chartLyrics"
-		DataObject.Songs[i].Query = songName + " " + artistName
 	}
 
 	return DataObject
